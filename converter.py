@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import redis
 import os
+import logging
 
 def convert(rows): 
 
-  print("Connecting to Redis")
+  logging.info("Connecting to Redis")
   r = redis.Redis(host=os.getenv("REDIS_HOST","127.0.0.1"), port=os.getenv("REDIS_PORT","6379"), db=0)
   csConverter = {
     "AMARILLO": "yellow",
@@ -13,7 +14,7 @@ def convert(rows):
     "ROJO": "red",
     "VERDE": "green"
   }
-  print("Connected")
+  logging.info("Connected")
 
   opDictionary = {}
   lastSite = None
@@ -28,7 +29,7 @@ def convert(rows):
     retries = int(row[5])
 
     if lastSite is not None and (idSite != lastSite or len(opDictionary) > 100000):
-      print("Saving site {0} with {1} items".format(lastSite, len(opDictionary)))
+      logging.info("Saving site {0} with {1} items".format(lastSite, len(opDictionary)))
       r.hmset("sites:"+lastSite+":tx", opDictionary)
       opDictionary = {}
     
