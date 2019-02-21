@@ -14,7 +14,8 @@ from spstransac t
 left join spstransac_cybersource c on c.idtransaccion = t.idtransaccion
 left join spstransac_subtransac tst on tst.idtransaccion = t.idtransaccion 
 left join spstransac st on st.idtransaccion = tst.idsubtransaccion 
-where (t.distribuida is null or t.distribuida = "F")
+where (t.distribuida is null or t.distribuida = "F") 
+  and t.idsite in ({2}) and t.fechainicio > "{3}"
 group by t.idtransaccion
 order by t.idsite, t.idtransaccionsite
 limit {0} OFFSET {1}"""
@@ -35,13 +36,22 @@ logging.info("Connected")
 
 page = 0
 limit = int(os.getenv("QUERY_LIMIT","100000"))
-while True:
+fechainicio = os.getenv("START_DATE","2019-01-01")
+sites = os.getenv("SITE_LIST","99999990,28464383,00120418").split(",")
+sitesStr = ",".join(list(map(lambda site: "\"{0}\"".format(site), sites)))
 
+logging.info("Deleting sets")
+for site in sites:
+  r.delete("sites:{0}:tx".format(site))
+
+while True:
+  
   cur=db.cursor()
   logging.info("Executing query with from page {0} limit {1}".format(page,limit))
-  dbQuery = rawQuery.format(limit, page * limit)
+  dbQuery = rawQuery.format(limit, page * limit,sitesStr,fechainicio)
   cur.execute(dbQuery)
   result = cur.fetchall()
+  
   if len(result) == 0:
     break
 
