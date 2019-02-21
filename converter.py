@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-import redis
 import os
 import logging
 
-def convert(rows): 
-
-  logging.info("Connecting to Redis")
-  r = redis.Redis(host=os.getenv("REDIS_HOST","127.0.0.1"), port=os.getenv("REDIS_PORT","6379"), db=0)
+def convert(rows, r): 
+  
   csConverter = {
     "AMARILLO": "yellow",
     "AZUL": "blue",
@@ -14,11 +11,10 @@ def convert(rows):
     "ROJO": "red",
     "VERDE": "green"
   }
-  logging.info("Connected")
 
   opDictionary = {}
   lastSite = None
-  lastIdOp = None
+  lastIdTx = None
 
   for row in rows:
     idSite = row[0].decode("utf-8")
@@ -27,6 +23,7 @@ def convert(rows):
     subTx = row[3]
     fraudDetection = row[4]
     retries = int(row[5])
+    idTx = int(row[6])
 
     if lastSite is not None and (idSite != lastSite or len(opDictionary) > 100000):
       logging.info("Saving site {0} with {1} items".format(lastSite, len(opDictionary)))
@@ -34,7 +31,7 @@ def convert(rows):
       opDictionary = {}
     
     lastSite = idSite
-    lastIdOp = idOp
+    lastIdTx = idTx
     
     opDictionary[idOp + ":status"] = txState
     if txState != 4:
@@ -47,6 +44,7 @@ def convert(rows):
       if subTx is not None:
         opDictionary[idOp + ":countSubpayments"] = subTx
   
+  logging.info("Saving site {0} with {1} items".format(lastSite, len(opDictionary)))
   r.hmset("sites:"+lastSite+":tx", opDictionary)
 
-  return (lastSite, lastIdOp)
+  return lastIdTx
