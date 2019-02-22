@@ -21,3 +21,5 @@ Se pueden cambiar las siguientes variables de entorno:
 - **QUERY_LIMIT:** Cantidad de TX que trae de la base en cada ciclo *(default 100000)*
 - **START_DATE:** Fecha desde la que toma las transacciones, usando la fechainicio de la tabla spstransac *(default sps433)*
 - **SITE_LIST:** Listado de sitios a volver a generar los sets en redis, separados por coma (por ejemplo, "11111111,22222222,33333333")
+- **SAFE_MODE:** Si usa el modo seguro, arma un nuevo set para cada sitio y al final elimina el viejo y renombra el nuevo. Caso contrario, primero borra el set y luego lo sobreescribe. Valores True o False *(default True)*
+
