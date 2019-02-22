@@ -2,7 +2,7 @@
 import os
 import logging
 
-def convert(rows, r): 
+def convert(rows, safeMode, r): 
   
   csConverter = {
     "AMARILLO": "yellow",
@@ -15,6 +15,7 @@ def convert(rows, r):
   opDictionary = {}
   lastSite = None
   lastIdTx = None
+  keySuffix = ":new" if safeMode else ""
 
   for row in rows:
     idSite = row[0].decode("utf-8")
@@ -27,7 +28,7 @@ def convert(rows, r):
 
     if lastSite is not None and (idSite != lastSite or len(opDictionary) > 100000):
       logging.info("Saving site {0} with {1} items".format(lastSite, len(opDictionary)))
-      r.hmset("sites:"+lastSite+":tx", opDictionary)
+      r.hmset("sites:"+lastSite+":tx"+keySuffix, opDictionary)
       opDictionary = {}
     
     lastSite = idSite
@@ -45,6 +46,6 @@ def convert(rows, r):
         opDictionary[idOp + ":countSubpayments"] = subTx
   
   logging.info("Saving site {0} with {1} items".format(lastSite, len(opDictionary)))
-  r.hmset("sites:"+lastSite+":tx", opDictionary)
+  r.hmset("sites:"+lastSite+":tx"+keySuffix, opDictionary)
 
   return lastIdTx

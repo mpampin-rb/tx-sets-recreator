@@ -12,5 +12,5 @@ logging.info("Connected")
 
 with open('temp.csv', 'r') as csvfile:
   csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-  convert(csvreader, r)
+  convert(csvreader, False, r)
 
