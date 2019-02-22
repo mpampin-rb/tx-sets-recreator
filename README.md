@@ -1,5 +1,5 @@
 # Tx sets replicator
-Replicador de sets con solo los últimos ids usados (limpia los ids anteriores a una fecha). Lo que hace es levantar de la base del sac todos los datos de las transacciones de los id sites indicados posteriores a la fecha indicada y recrear los sets de redis con la key "sites:<siteid>:tx"
+Replicador de sets con solo los últimos ids usados (limpia los ids anteriores a una fecha). Lo que hace es levantar de la base del sac todos los datos de las transacciones de los id sites indicados posteriores a la fecha indicada y recrear los sets de redis con la key "sites:*siteid*:tx"
 
 ## Cómo usar
 Hay que bajar la imagen registry-desa.prismamediosdepago.com/decidir2/tx-sets-replicator:latest y ejecutarla con las variables de entorno necesarias
