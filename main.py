@@ -20,7 +20,8 @@ group by t.idtransaccion
 order by t.idsite, t.idtransaccionsite
 limit {0} OFFSET {1}"""
 
-safeMode=bool(os.getenv("SAFE_MODE","True"))
+safeMode=os.getenv("SAFE_MODE","true") == "true"
+deleteOld=os.getenv("DELETE_OLD","true") == "true"
 logging.info(
   "Running in safe mode. This means that I'll create keys with different names and then replace old ones." if safeMode
   else "WARNING: running in not safe mode. This means that I'll delete keys and create new ones with the same name."
@@ -40,18 +41,18 @@ logging.info("Connecting to Redis")
 r = redis.Redis(host=os.getenv("REDIS_HOST","127.0.0.1"), port=os.getenv("REDIS_PORT","6379"), db=0)
 logging.info("Connected")
 
-if not safeMode:
-  logging.info("Deleting sites sets")
-  for site in sites:
-    logging.info("Deleting sites:{0}:tx".format(site))
-    r.delete("sites:{0}:tx".format(site))
-
 page = 0
 limit = int(os.getenv("QUERY_LIMIT","100000"))
 fechainicio = os.getenv("START_DATE","2019-01-01")
 sites = os.getenv("SITE_LIST","99999990,28464383,00120418").split(",")
 sitesStr = ",".join(list(map(lambda site: "\"{0}\"".format(site), sites)))
 
+if not safeMode and deleteOld:
+  logging.info("Deleting sites sets")
+  for site in sites:
+    logging.info("Deleting sites:{0}:tx".format(site))
+    r.delete("sites:{0}:tx".format(site))
+    
 while True:
   
   cur=db.cursor()
