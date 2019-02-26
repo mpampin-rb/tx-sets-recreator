@@ -27,10 +27,11 @@ Se pueden cambiar las siguientes variables de entorno:
 ## Cómo ejecutar en un ambiente
 
 Entrar a un nodo del ambiente y ejecutar los siguientes comandos cambiando las variables de entorno de mysql, redis, los ids de los sitios a limpiar y la fecha.
-```
+
+<pre>
 docker pull docker run registry-desa.prismamediosdepago.com/decidir2/tx-sets-replicator:0.0.1
-docker run -it -e *MYSQL_HOST=localhost* -e *MYSQL_PORT=3306* -e *MYSQL_USER=usuario* -e *MYSQL_PASSWORD=password* -e *REDIS_HOST=localhost* -e *REDIS_PORT=6379* -e *QUERY_LIMIT=500000* *SITE_LIST=11111111,22222222,33333333* -e *START_DATE=2019-01-01* registry-desa.prismamediosdepago.com/decidir2/tx-sets-replicator:0.0.1
-```
+docker run -it -e <b>MYSQL_HOST=localhost</b> -e <b>MYSQL_PORT=3306</b> -e <b>MYSQL_USER=usuario</b> -e <b>MYSQL_PASSWORD=password</b> -e <b>REDIS_HOST=localhost</b> -e <b>REDIS_PORT=6379</b> -e <b>QUERY_LIMIT=500000</b> <b>SITE_LIST=11111111,22222222,33333333</b> -e <b>START_DATE=2019-01-01</b> registry-desa.prismamediosdepago.com/decidir2/tx-sets-replicator:0.0.1
+</pre>
 
 En producción es probable que entre que arrancó y terminó de ejecutarse hayan caido nuevas operaciones que no aparezcan en el set nuevo en redis. Para solucionar esto se puede volver a correr el container poniendo como fecha el día de hoy y con *SAFE_MODE y DELETE_OLD en false* para que agregue lo que falta (de nuevo, cambiar las variables de mysql, redis, sites y fecha):
 
