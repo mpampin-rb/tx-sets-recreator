@@ -38,3 +38,10 @@ En producción es probable que entre que arrancó y terminó de ejecutarse hayan
 <pre>
 docker run -it -e <b>MYSQL_HOST=localhost</b> -e <b>MYSQL_PORT=3306</b> -e <b>MYSQL_USER=usuario</b> -e <b>MYSQL_PASSWORD=password</b> -e <b>REDIS_HOST=localhost</b> -e <b>REDIS_PORT=6379</b> -e <b>QUERY_LIMIT=500000</b> <b>SITE_LIST=11111111,22222222,33333333</b> -e <b>START_DATE=FECHA_DE_HOY</b> -e SAFE_MODE=false -e DELETE_OLD=false  registry-desa.prismamediosdepago.com/decidir2/tx-sets-replicator:0.0.1
 </pre>
+
+## ¿Qué pruebas hacer?
+
+1. **Prueba de reutilización:** Hacer un pago fallido antes de ejecutar los scripts de limpieza. Luego, después de correr los script, intentar reutilizar el site_transaction_id del pago anterior. Debería poder hacer el pago sin problemas y haber aumentado en 1 la cantidad de repeticiones en redis (key site:*siteid*:tx, subkey *site_transaction_id*:reps, el value debería haber sumado 1).
+2. **Prueba de no-reutilización:** Hacer un pago aprobado antes de ejecutar los scripts de limpieza. Luego, después de correr los scripts, intentar reutilizar el site_transaction_id del pago anterior. Debería fallar el pago por site_transaction_id repetido.
+3. **Ids viejos:** Luego de ejecutar los scripts, intentar utilizar un site_transaction_id viejo (previo a la fecha elegida en START_DATE). Debería poder hacer el pago con el id.
+4. **Ids no tan viejos:** Luego de ejecutar los scripts, intentar utilizar un site_transaction_id que haya sido usado para un pago aprobado después de la fecha START_DATE. Debería fallar por site_transaction_id repetido.
